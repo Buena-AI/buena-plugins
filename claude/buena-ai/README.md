@@ -27,8 +27,8 @@ permissions. The plugin contains no code and sends data nowhere else: the
 skills are instructions for Claude, and all actions go through the Buena MCP
 server.
 
-You need a Buena account. Research, email reveals, and enrichment use your
-workspace's Buena credits, and every such action asks for your approval first.
+You need a Buena account. Research, work-email reveals, and enrichment can use
+credits, and every such action asks for your approval first.
 
 - Privacy policy: https://buena.ai/privacy-policy
 - Terms: https://buena.ai/terms-of-service

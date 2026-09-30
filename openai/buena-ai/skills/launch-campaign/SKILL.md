@@ -19,9 +19,19 @@ runs only after their explicit yes.
 - **LinkedIn:** `buena_list_linkedin_senders` separates regular workspace
   accounts (`workspace_account`) from managed fractional SDRs
   (`managed_fractional_sdr`). An empty managed list doesn't mean the workspace
-  has no LinkedIn accounts. Add workspace accounts to a draft with
-  `buena_add_linkedin_senders_to_campaign`; attach fractional SDRs with the
-  build-campaign skill. The two kinds can't be mixed in one campaign.
+  has no LinkedIn accounts. To add workspace accounts to a draft, show the
+  campaign and the exact accounts, then after a yes call
+  `buena_add_linkedin_senders_to_campaign` with `selectionConfirmed: true`.
+  The two kinds can't be mixed in one campaign.
+- **Fractional SDRs on an email campaign:** once the email draft has its
+  sequence (see the personalize-drafts skill) and a connected mailbox, and is
+  still a draft, Buena's fractional SDRs can run LinkedIn outreach to the same
+  leads. List them with `buena_list_fractional_sdrs`, then show the owner,
+  campaign, chosen SDRs, brief, lead count, and LinkedIn-eligible lead count.
+  After a yes, call `buena_attach_fractional_sdr_to_campaign` with
+  `selectionConfirmed: true` and one UUID `idempotencyKey`, reused unchanged on
+  any retry. It uses the campaign's leads that have LinkedIn URLs, so no list
+  is needed.
 
 ## Check status
 
@@ -32,12 +42,15 @@ state, and scheduled times.
 
 **Email campaigns** (with or without managed LinkedIn):
 
-1. Check delivery status, then show the exact campaign, the number of pending
-   drafts, the sender allocation, and the delivery schedule.
-2. After the user explicitly approves, call
-   `buena_approve_and_activate_campaign` with `approvalConfirmed: true` and one
-   UUID `idempotencyKey`. Reuse that key if you retry; a new key would be a new
-   launch.
+1. Check delivery status. If there are no pending drafts, say so and don't
+   launch: approving nothing doesn't activate the campaign.
+2. Show the exact campaign, the number of pending drafts, the sender
+   allocation, and the delivery schedule.
+3. After the user explicitly approves, call
+   `buena_approve_and_activate_campaign` with `approvalConfirmed: true`, either
+   `approveAll: true` (the user approved every pending draft) or the exact
+   `draftIds` they approved, and one UUID `idempotencyKey`. Reuse that key if
+   you retry; a new key would be a new launch.
 
 **LinkedIn-only fractional SDR campaigns:**
 

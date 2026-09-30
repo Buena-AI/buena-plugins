@@ -3,17 +3,27 @@
   "name": "buena-ai",
   "version": "1.0.0",
   "description": "Find prospects with Buena signals, turn them into reviewed draft campaigns, and launch only what you approve.",
-  "author": { "name": "Buena AI", "url": "https://buena.ai" },
+  "author": {
+    "name": "Buena AI",
+    "url": "https://buena.ai"
+  },
   "homepage": "https://buena.ai/mcp",
   "repository": "https://github.com/Buena-AI/buena-plugins",
   "license": "MIT",
-  "keywords": ["sales", "prospecting", "outreach", "signals", "email", "linkedin"],
+  "keywords": [
+    "sales",
+    "prospecting",
+    "outreach",
+    "signals",
+    "email",
+    "linkedin"
+  ],
   "extensions": {
     "com.openai": {
       "interface": {
         "displayName": "Buena AI",
         "shortDescription": "Find prospects, draft outreach",
-        "longDescription": "Buena AI connects ChatGPT and Codex to your Buena workspace so you can find the right people to contact and prepare personalized outreach without leaving the conversation.\n\nFind prospects: create and refine Buena people signals, reuse a signal's targeting in other countries, grow signals to more people, and rank prospects across signals with a weighted rubric scored by your own model.\n\nBuild campaigns: choose a product, pick the exact people, and turn them into draft email or LinkedIn campaigns, using verified work-email enrichment or a list you already own. Buena's fractional SDRs can run managed LinkedIn outreach alongside email.\n\nPersonalize: Buena gathers bounded research on each lead, your model writes the drafts, and Buena checks every draft before it is saved.\n\nLaunch on your terms: anything that spends credits, changes a campaign, or reaches real people is shown to you first and runs only after you approve it. Drafts stay unapproved until you launch.\n\nSign in with your Buena account; the plugin acts only within your own workspace permissions.",
+        "longDescription": "Built for sales and go-to-market teams. Buena AI connects ChatGPT and Codex to your Buena workspace so you can find the right people to contact and prepare personalized outreach without leaving the conversation.\n\nFind prospects: create and refine Buena people signals, reuse a signal's targeting in other countries, grow signals to more people, and rank prospects across signals with a weighted rubric scored by your own model.\n\nBuild campaigns: choose a product, pick the exact people, and turn them into draft email or LinkedIn campaigns, using verified work-email enrichment or a list you already own. Buena's fractional SDRs can run managed LinkedIn outreach alongside email.\n\nPersonalize: Buena gathers bounded research on each lead, your model writes the drafts, and Buena checks every draft before it is saved.\n\nLaunch on your terms: anything that spends credits, changes a campaign, or reaches real people is shown to you first and runs only after you approve it. Drafts stay unapproved until you launch.\n\nRequires a Buena account: you sign in with Buena, and the plugin acts only within your own workspace permissions. Signals return people rather than company records, and some workspace settings are managed in the Buena app.",
         "developerName": "Buena AI",
         "category": "Productivity",
         "websiteURL": "https://buena.ai",
@@ -26,8 +36,8 @@
           "Which of my campaigns are ready to launch?"
         ],
         "brandColor": "#143E35",
-        "logo": "assets/logo.png",
-        "composerIcon": "assets/composer-icon.png"
+        "logo": "./assets/logo.png",
+        "composerIcon": "./assets/composer-icon.png"
       }
     }
   }

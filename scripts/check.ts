@@ -165,10 +165,25 @@ function checkOpenAI() {
       if (/\$|pric|plan\b|plans\b|subscri|discount|upgrade|free trial/i.test(ui.longDescription ?? "")) {
         fail(manifestPath, "interface.longDescription must not mention pricing, plans, subscriptions, discounts, or upgrades");
       }
+      // OpenAI asks for tasks, intended users, and limitations.
+      if (!/sales/i.test(ui.longDescription ?? "") || !/Buena account/i.test(ui.longDescription ?? "")) {
+        fail(manifestPath, "interface.longDescription must name its intended users (sales teams) and limitations (needs a Buena account)");
+      }
       for (const key of ["logo", "composerIcon"]) {
-        const size = typeof ui[key] === "string" ? pngSize(join(pkg, ui[key])) : undefined;
+        const value = ui[key];
+        // OpenAI: "Use ./-prefixed paths relative to the plugin root".
+        if (typeof value !== "string" || !value.startsWith("./")) {
+          fail(manifestPath, `interface.${key} must be a ./-prefixed path inside the package`);
+          continue;
+        }
+        const resolved = join(pkg, value);
+        if (!resolved.startsWith(pkg + "/")) {
+          fail(manifestPath, `interface.${key} must stay inside the package`);
+          continue;
+        }
+        const size = pngSize(resolved);
         if (!size) fail(manifestPath, `interface.${key} must point at a PNG in the package`);
-        else if (size.width !== size.height || size.width < 48) fail(join(pkg, ui[key]), `must be square and at least 48 px; is ${size.width}×${size.height}`);
+        else if (size.width !== size.height || size.width < 48) fail(resolved, `must be square and at least 48 px; is ${size.width}×${size.height}`);
       }
     }
   }
@@ -186,14 +201,93 @@ function checkOpenAI() {
   checkPackageFiles("openai/buena-ai");
 }
 
+// Wording the directories and the live server depend on. Each rule guards a
+// review finding: launch parameters, approval before every write, and treating
+// server-returned prompts as data.
+const CONTENT_RULES: {
+  skill: string;
+  include?: RegExp[];
+  exclude?: RegExp[];
+  near?: [string, RegExp][];
+}[] = [
+  {
+    skill: "launch-campaign",
+    include: [/approveAll/, /draftIds/, /no pending drafts/i],
+    near: [
+      ["buena_attach_fractional_sdr_to_campaign", /selectionConfirmed/],
+      ["buena_attach_fractional_sdr_to_campaign", /\byes\b/],
+      ["buena_add_linkedin_senders_to_campaign", /\byes\b/],
+    ],
+  },
+  {
+    skill: "build-campaign",
+    exclude: [/email draft must exist first/i, /only step\s+here\s+that\s+spends\s+credits/i],
+    near: [
+      ["buena_create_fractional_sdr_campaign", /selectionConfirmed/],
+      ["buena_create_fractional_sdr_campaign", /\byes\b/],
+      ["buena_create_product", /\byes\b/],
+    ],
+  },
+  { skill: "find-prospects", include: [/as data/i], exclude: [/follow them/i] },
+  {
+    skill: "personalize-drafts",
+    include: [/as data/i, /in the Buena\s+app/i],
+    exclude: [/follow them/i],
+    near: [
+      ["buena_update_campaign_draft", /\byes\b/],
+      ["buena_update_campaign_sequence_step", /\byes\b/],
+      ["buena_workspace_prepare_work", /\byes\b/],
+    ],
+  },
+];
+
+function checkSkillContent() {
+  for (const rule of CONTENT_RULES) {
+    const path = join(root, "skills", rule.skill, "SKILL.md");
+    if (!existsSync(path)) continue;
+    const text = readFileSync(path, "utf8");
+    for (const pattern of rule.include ?? []) {
+      if (!pattern.test(text)) fail(path, `must mention ${pattern}`);
+    }
+    for (const pattern of rule.exclude ?? []) {
+      if (pattern.test(text)) fail(path, `must not say ${pattern}`);
+    }
+    for (const [tool, pattern] of rule.near ?? []) {
+      const windows = [...text.matchAll(new RegExp(tool, "g"))].map((m) =>
+        text.slice(Math.max(0, (m.index ?? 0) - 400), (m.index ?? 0) + 400),
+      );
+      if (!windows.some((window) => pattern.test(window))) {
+        fail(path, `${tool} must be described with ${pattern} nearby`);
+      }
+    }
+  }
+}
+
+// The repository is public: no local paths, private endpoints, or private repo names.
+function checkPublicHygiene() {
+  const leaks = [/\/Users\//, /\/Volumes\//, /admin\/mcp/, /signals\/mcp/, /buena-mail-app/];
+  const files = walk(root).filter(
+    (p) => !/\/(\.git|dist|\.superpowers)\//.test(p) && !/\.(png|jpe?g|gif|webp)$/i.test(p),
+  );
+  for (const path of files) {
+    if (path.endsWith("scripts/check.ts")) continue;
+    const text = readFileSync(path, "utf8");
+    for (const leak of leaks) {
+      if (leak.test(text)) fail(path, `contains private detail ${leak}`);
+    }
+  }
+}
+
 if (["skills", "claude", "openai", "all"].indexOf(section) < 0) {
   console.error(`unknown section ${section}; use skills, claude, openai, or all`);
   process.exit(2);
 }
 checkSkillsSource();
+checkSkillContent();
 if (section === "claude" || section === "all") checkClaude();
 if (section === "openai" || section === "all") checkOpenAI();
-for (const path of walk(root).filter((p) => !p.includes("/.git/") && !p.includes("/dist/"))) {
+if (section === "all") checkPublicHygiene();
+for (const path of walk(root).filter((p) => !/\/(\.git|dist|\.superpowers)\//.test(p))) {
   if (path.endsWith(".DS_Store")) fail(path, "remove .DS_Store");
 }
 if (failures.length) {

@@ -6,15 +6,16 @@ description: Turn Buena signal results or the user's own prospect list into a dr
 # Build a Buena draft campaign
 
 Everything here creates drafts. Nothing is sent until the user launches the
-campaign (see the launch-campaign skill), and enrichment is the only step here
-that spends credits.
+campaign (see the launch-campaign skill). Enrichment, requeued enrichment, and
+work-email reveals can spend credits, so say so before each one.
 
 ## From signal results
 
 1. **Product.** Call `buena_list_products` and let the user choose the product
-   the campaign is about. If none fits, create one with `buena_create_product`
-   using only facts the user gives you: the product governs what drafts may
-   claim, so never invent outcomes, customers, or numbers.
+   the campaign is about. If none fits, draft one from facts the user gives
+   you: the product governs what drafts may claim, so never invent outcomes,
+   customers, or numbers. Show the draft, and after a yes create it with
+   `buena_create_product`.
 2. **People.** Show results with `buena_list_signal_results` and let the user
    pick the exact people. Don't choose for them.
 3. **Email lookup.** Ask which kind of email to look for:
@@ -60,11 +61,12 @@ generate leads for these campaigns; they use the user's list or an existing
 draft's leads.
 
 - List them with `buena_list_fractional_sdrs` and let the user choose.
-- **New campaign from the user's list:** `buena_create_fractional_sdr_campaign`
-  after showing the owner, SDRs, brief, and prospect count.
-- **Add LinkedIn to an existing email draft:**
-  `buena_attach_fractional_sdr_to_campaign`. It uses the draft's leads that
-  have LinkedIn URLs, so no list is needed; the email draft must exist first.
+- **New campaign from the user's list:** every row needs a LinkedIn profile
+  URL. Show the owner, SDRs, brief, and prospect count; after a yes call
+  `buena_create_fractional_sdr_campaign` with `selectionConfirmed: true` and
+  one UUID `idempotencyKey`, reused unchanged on any retry.
+- **Add LinkedIn to an email campaign:** this comes after the email draft has
+  its messages and a mailbox, so it's covered in the launch-campaign skill.
 - **Replace SDRs on a draft:** call
   `buena_preview_fractional_sdr_campaign_reassignment`, show the current,
   added, removed, and final SDRs, then after a yes call
