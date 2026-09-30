@@ -1,0 +1,11 @@
+{
+  "name": "buena-ai",
+  "displayName": "Buena AI",
+  "version": "1.0.0",
+  "description": "Find prospects with Buena signals, turn them into reviewed draft campaigns, and launch only what you approve.",
+  "author": { "name": "Buena AI", "url": "https://buena.ai" },
+  "homepage": "https://buena.ai/mcp",
+  "repository": "https://github.com/Buena-AI/buena-plugins",
+  "license": "MIT",
+  "keywords": ["sales", "prospecting", "outreach", "signals", "email", "linkedin"]
+}

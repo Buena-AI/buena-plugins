@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "buena": {
+      "type": "http",
+      "url": "https://mcp.buena.ai/mcp"
+    }
+  }
+}
