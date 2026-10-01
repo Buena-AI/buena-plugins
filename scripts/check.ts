@@ -212,7 +212,7 @@ const CONTENT_RULES: {
 }[] = [
   {
     skill: "launch-campaign",
-    include: [/approveAll/, /draftIds/, /no pending drafts/i],
+    include: [/approveAll/, /draftIds/, /no pending drafts/i, /Buena membership/, /engage\.buena\.ai/],
     near: [
       ["buena_attach_fractional_sdr_to_campaign", /selectionConfirmed/],
       ["buena_attach_fractional_sdr_to_campaign", /\byes\b/],
@@ -221,6 +221,7 @@ const CONTENT_RULES: {
   },
   {
     skill: "build-campaign",
+    include: [/Buena membership/],
     exclude: [/email draft must exist first/i, /only step\s+here\s+that\s+spends\s+credits/i],
     near: [
       ["buena_create_fractional_sdr_campaign", /selectionConfirmed/],
@@ -228,10 +229,14 @@ const CONTENT_RULES: {
       ["buena_create_product", /\byes\b/],
     ],
   },
-  { skill: "find-prospects", include: [/as data/i], exclude: [/follow them/i] },
+  {
+    skill: "find-prospects",
+    include: [/as data/i, /Buena membership/, /buena_workspace_research/, /managed workspace/i],
+    exclude: [/follow them/i],
+  },
   {
     skill: "personalize-drafts",
-    include: [/as data/i, /in the Buena\s+app/i],
+    include: [/as data/i, /in the Buena\s+app/i, /Buena membership/, /LinkedIn level 0/],
     exclude: [/follow them/i],
     near: [
       ["buena_update_campaign_draft", /\byes\b/],

@@ -9,6 +9,15 @@ Buena researches each lead and checks every draft; by default you write the
 copy with your own model. Drafts stay unapproved until the user launches the
 campaign, so writing and saving them never sends anything.
 
+## Which path your workspace has
+
+- **Buena membership:** write drafts with your own model (next section).
+  Drafts are email-only: use LinkedIn level 0 and leave teammate follow-up
+  off. To change a saved draft, write it again and save it again.
+- **Managed workspace:** every section applies.
+
+Only call tools you can see.
+
 ## Write drafts with your own model (default)
 
 1. Check the campaign with `buena_get_campaign`. Personalization works on draft
@@ -32,7 +41,7 @@ campaign, so writing and saving them never sends anything.
    This replaces any unsent drafts for those leads. Repeat in batches of ten.
 8. Show the saved drafts with `buena_list_campaign_drafts`.
 
-## Buena-hosted generation
+## Buena-hosted generation (managed workspaces)
 
 Use this only when the user chooses Buena's hosted model:
 
@@ -44,7 +53,7 @@ Use this only when the user chooses Buena's hosted model:
    unsent drafts.
 3. Follow progress with `buena_get_personalization_progress`.
 
-## Edit drafts
+## Edit drafts (managed workspaces)
 
 - `buena_update_campaign_draft` changes one unsent draft and returns it to
   pending review. It overwrites the previous text, so show the exact change

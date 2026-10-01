@@ -9,6 +9,16 @@ Launching is the step that reaches real people, and outreach can't be unsent.
 So every launch, pause, and resume shows the user the exact campaign first and
 runs only after their explicit yes.
 
+## Buena memberships launch in the Buena app
+
+If you don't have `buena_approve_and_activate_campaign`, the workspace is a
+Buena membership: the user reviews, approves, and launches campaigns
+themselves in the Buena app at engage.buena.ai. Show them the campaign that is
+ready (`buena_get_campaign`, `buena_list_campaign_drafts`) and where to
+approve it, and don't try another way to send.
+
+The rest of this skill applies to managed workspaces.
+
 ## Senders
 
 - **Email:** list mailboxes with `buena_list_email_senders`, let the user pick
