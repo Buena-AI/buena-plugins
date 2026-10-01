@@ -5,15 +5,17 @@ description: Write, preview, revise, and save personalized outreach drafts for a
 
 # Personalize Buena campaign drafts
 
-Buena researches each lead and checks every draft; by default you write the
-copy with your own model. Drafts stay unapproved until the user launches the
+Buena gives you each lead's details (in managed workspaces, with Buena's own
+research about the lead) and checks every draft; by default you write the copy
+with your own model. Drafts stay unapproved until the user launches the
 campaign, so writing and saving them never sends anything.
 
 ## Which path your workspace has
 
-- **Buena membership:** write drafts with your own model (next section).
-  Drafts are email-only: use LinkedIn level 0 and leave teammate follow-up
-  off. To change a saved draft, write it again and save it again.
+- **Buena membership:** write drafts with your own model (next section), or
+  save drafts you wrote outside Buena (last section). Drafts are email-only:
+  use LinkedIn level 0 and leave teammate follow-up off. To change a saved
+  draft, write it again and save it again.
 - **Managed workspace:** every section applies.
 
 Only call tools you can see.
@@ -62,7 +64,7 @@ Use this only when the user chooses Buena's hosted model:
   threading preference while the campaign is a draft and generation is idle.
   Show the new timing and make the change only after a yes.
 
-## Drafts written outside Buena
+## Drafts written outside Buena (Buena membership)
 
 If you researched and wrote drafts yourself, save them with
 `buena_workspace_save_supplied_work` (findings with sources, and drafts; no

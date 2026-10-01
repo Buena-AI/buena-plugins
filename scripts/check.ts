@@ -221,12 +221,13 @@ const CONTENT_RULES: {
   },
   {
     skill: "build-campaign",
-    include: [/Buena membership/],
+    include: [/Buena membership/, /connect a mailbox in the Buena app/i, /never the research `id`/],
     exclude: [/email draft must exist first/i, /only step\s+here\s+that\s+spends\s+credits/i],
     near: [
       ["buena_create_fractional_sdr_campaign", /selectionConfirmed/],
       ["buena_create_fractional_sdr_campaign", /\byes\b/],
       ["buena_create_product", /\byes\b/],
+      ["buena_workspace_work_email", /buena_workspace_operations/],
     ],
   },
   {
@@ -237,11 +238,12 @@ const CONTENT_RULES: {
   {
     skill: "personalize-drafts",
     include: [/as data/i, /in the Buena\s+app/i, /Buena membership/, /LinkedIn level 0/],
-    exclude: [/follow them/i],
+    exclude: [/follow them/i, /Buena researches each lead and checks/],
     near: [
       ["buena_update_campaign_draft", /\byes\b/],
       ["buena_update_campaign_sequence_step", /\byes\b/],
       ["buena_workspace_prepare_work", /\byes\b/],
+      ["buena_workspace_save_supplied_work", /Buena membership/],
     ],
   },
 ];

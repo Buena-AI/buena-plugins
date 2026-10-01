@@ -60,7 +60,8 @@ signals, enrichment, or credits are involved.
    email if email is a channel, and a LinkedIn profile URL if LinkedIn is.
 2. Choose the product, senders (`buena_list_email_senders`, and, in managed
    workspaces, regular workspace accounts from `buena_list_linkedin_senders`),
-   schedule, and brief.
+   schedule, and brief. A campaign needs a sender: if there's no active
+   mailbox, stop and ask the user to connect a mailbox in the Buena app first.
 3. Show the owner, row count, duplicate and suppression handling, senders, and
    schedule. After a yes, call `buena_create_campaign_from_customer_list` with
    `selectionConfirmed: true` and one UUID `idempotencyKey`, generated once and
@@ -85,12 +86,16 @@ draft's leads.
   `buena_reassign_fractional_sdr_campaign` with the preview's
   `expectedRevision`.
 
-## Reveal work emails without a campaign
+## Reveal work emails
 
 Get a quote with `buena_workspace_quote` (action `work-email`), show it, and
 after the user approves call `buena_workspace_work_email` for up to 10 people
-with `maximumCredits` and `confirmed: true`. Only emails actually found are
-charged. Reuse the same `operationId` after a timeout.
+with `maximumCredits` and `confirmed: true`. Describe each person by their
+LinkedIn URL, first and last name, and company domain, never the research `id`
+(it comes from a different provider and won't match). Only emails actually
+found are charged. The reveal runs in the background: check
+`buena_workspace_operations` until it settles and read the emails there.
+Reuse the same `operationId` after a timeout.
 
 ## What comes next
 
