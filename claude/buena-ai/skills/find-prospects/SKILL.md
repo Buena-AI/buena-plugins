@@ -85,9 +85,16 @@ For people the user names:
 2. Show who each call found, with title, company, and LinkedIn URL. If no
    result is clearly the named person, say so instead of picking the closest
    one.
-3. These people are not signal results, so signal email lookup doesn't run on
-   them. If the user has their emails or LinkedIn URLs, the build-campaign
-   skill covers starting a campaign from that list.
+3. To look up their emails, save the people the user picks to one of the
+   user's people signals with `buena_add_people_to_signal`, passing each
+   person as `buena_find_people` returned them. Confirm the signal and the
+   people first. Saving runs no search and spends no credits, and a person
+   already in the signal isn't added twice.
+4. The saved people are now ordinary signal results with result IDs, so the
+   build-campaign skill covers looking up their emails and drafting the
+   campaign. If `buena_add_people_to_signal` isn't available, these people
+   can't go through email lookup yet; if the user already has their emails or
+   LinkedIn URLs, build-campaign covers starting a campaign from that list.
 
 ## When a signal has no results
 
