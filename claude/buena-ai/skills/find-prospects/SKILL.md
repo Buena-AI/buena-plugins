@@ -13,7 +13,8 @@ Buena shows each workspace only the tools it can use:
   tools. Find prospects with research (next section) and skip the signal
   sections.
 - **Managed workspace:** you have the signal tools, such as
-  `buena_create_signal`. Use signals.
+  `buena_create_signal` and `buena_find_people`. Use signals to discover
+  people, and `buena_find_people` to look up people the user names.
 
 Only call tools you can see. If you have neither, tell the user their
 workspace doesn't include prospect search.
@@ -64,7 +65,48 @@ approval, so set it only after they give it.
    up to 250 and super admins up to 500; mention the count when you confirm.
 3. After the user approves, call `buena_create_signal`.
 4. Check `buena_get_signal` until processing finishes, then show results with
-   `buena_list_signal_results`.
+   `buena_list_signal_results`. If there are none, see "When a signal has no
+   results" below.
+
+## Look up specific people
+
+A signal discovers people from a description. It is not a lookup. Buena turns
+the query into a few short search phrases, and it skips anyone already saved as
+a lead in the workspace. So a list of named people ("Parth Patel at HUD, Will
+Brown at Prime Intellect...") doesn't come back from a signal, even when every
+name is in the query.
+
+For people the user names:
+
+1. Plan one `buena_find_people` call per person, with their name and employer
+   in the query, for example "Parth Patel, co-founder and CTO at HUD
+   (hud.so)", and `limit` 3. Each call uses search credits, so say how many
+   lookups you'll run and get a yes first.
+2. Show who each call found, with title, company, and LinkedIn URL. If no
+   result is clearly the named person, say so instead of picking the closest
+   one.
+3. These people are not signal results, so signal email lookup doesn't run on
+   them. If the user has their emails or LinkedIn URLs, the build-campaign
+   skill covers starting a campaign from that list.
+
+## When a signal has no results
+
+`buena_get_signal` reports `searchProgress.found` and `searchProgress.analyzed`.
+Those count people the search looked at, not results. `itemCount` counts
+results, and newer versions add an `outcome` with a one-line summary. When the
+search has finished, has checked people, and has no results, nobody matched the
+criteria. Tell the user that with the numbers ("17 people checked, none
+matched"). Don't describe it as missing or lost data.
+
+Then suggest one change and show it before running anything:
+
+- Loosen the strictest criterion. Criteria that ask for public evidence, such
+  as "public evidence of owning training data", reject most people.
+- Broaden the query, or move a requirement from the criteria into the query.
+- For named people, use the lookup above.
+
+People already saved as leads in the workspace are never returned again by a
+signal, so a signal aimed at existing contacts can also come back empty.
 
 ## Edit a signal
 
