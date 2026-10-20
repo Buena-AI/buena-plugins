@@ -8,9 +8,10 @@ Buena account.
 
 ## Install
 
-- **Claude Code:** `claude plugin install buena-ai --marketplace Buena-AI/buena-plugins`
-  (or, in a session, `/plugin marketplace add Buena-AI/buena-plugins` then
-  `/plugin install buena-ai@buena`), then run `/mcp`, pick
+- **Claude Code:** `claude plugin marketplace add Buena-AI/buena-plugins && claude plugin install buena-ai@buena`
+  (on v2.1.292 or later, `claude plugin install buena-ai --marketplace Buena-AI/buena-plugins`
+  does both; in a session, `/plugin marketplace add Buena-AI/buena-plugins`
+  then `/plugin install buena-ai@buena`), then run `/mcp`, pick
   `plugin:buena-ai:buena` and sign in.
 - **Codex:** `codex plugin marketplace add Buena-AI/buena-plugins && codex plugin add buena-ai@buena && codex mcp login buena`
 - **Claude app:** Customize > Plugins > Add marketplace, enter
@@ -18,6 +19,15 @@ Buena account.
 - **MCP only** (assistants without plugins): add `https://mcp.buena.ai/mcp`
   as a remote MCP server. Use one route: installing the plugin and the bare
   server gives you every tool twice.
+
+## Update
+
+Claude Code and Codex keep the installed version until you update it:
+
+- **Claude Code:** `claude plugin marketplace update buena && claude plugin update buena-ai@buena`,
+  then restart; or turn on auto-update under `/plugin` > Marketplaces > buena.
+- **Codex:** `codex plugin marketplace upgrade buena`
+- **Claude app:** Customize > Plugins, then Update on the Buena marketplace.
 
 ## What's inside
 

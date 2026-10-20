@@ -28,6 +28,10 @@ the section you need; the Rules apply everywhere.
    owners and admins may pass a teammate's email (super admins any user).
    Anyone in the workspace can read a signal, but only its owner (or a manager
    with `ownerEmail`) can edit, clone, expand, enrich, or save people to it.
+   Campaigns too: `buena_list_campaigns` lists the whole workspace (owners
+   only as `createdById`), but tools that take `ownerEmail` act only on the
+   owner's campaigns. "Not found for this campaign owner" means a teammate's
+   campaign: don't present it as the user's or offer to launch it.
    `buena_list_campaigns`, `buena_list_campaign_drafts`,
    `buena_update_campaign_draft`, `buena_update_campaign_sequence_step` and
    `buena_generate_campaign_personalization` take no `ownerEmail`.
@@ -147,6 +151,11 @@ visits no profiles and sends nothing.
   `newSignalTitle` (a new signal that runs no search of its own). Show the
   filters and target; after a yes, call `buena_search_connections` with them
   and `confirmed: true`.
+- It takes no retry key. If a call with `newSignalTitle` times out or fails,
+  look for that title with `buena_list_signals` (`onlyMine: true`) before
+  retrying: if the signal exists, its people were probably saved, so show
+  them, and retry only with its `signalId`, never `newSignalTitle` again.
+  Each retry uses another call of the daily budget.
 - `limit` up to 100 per page (default 50). Next page: `cursor` = `nextCursor`
   with the same filters and the `signalId` the first page saved to, never
   `newSignalTitle` again. One search returns at most 2,500 people; narrow the
@@ -198,27 +207,12 @@ checks, saves and ranks scores 0-100. Thumbs-up/down ratings never change.
 
 ## Grow signals (managed)
 
-Both tools recompute the plan from the confirming call's input: the
-`operationId` alone doesn't carry it, and omitted counts fall back to defaults
-that can request more or fewer people than the user approved.
-
-**More people.** `buena_preview_signal_expansion` with `signalIds` (up to 20)
-and `targetResultCount` (total per signal, up to 100, default 100); keep the
-`operationId` it returns. Show each signal's current count, target and
-missing people, and the total. After a yes, `buena_expand_signal_to_target`
-with exactly the previewed `signalIds`, `targetResultCount` and
-`operationId`, plus `confirmed: true`. Buena requests only the missing people.
-
-**Other countries.** Read the source with `buena_get_signal`; one with more
-than five criteria can't be cloned. `buena_preview_signal_geo_clones` with
-`sourceSignalId`, `sourceGeography`, optional `sourceLanguages`, `targets`
-(up to 20 `{country, languages}`) and `prospectCount` (per new signal,
-default 25); keep its `operationId`. Show every planned query and criterion
-and the total (countries × `prospectCount`). After a yes,
-`buena_create_signal_geo_clones` with exactly the previewed `sourceSignalId`,
-`sourceGeography`, `sourceLanguages`, `targets`, `prospectCount` and
-`operationId`, plus `confirmed: true`. Retrying with that `operationId` never
-duplicates signals.
+To add people to signals (`buena_preview_signal_expansion`, then
+`buena_expand_signal_to_target`) or copy a signal's targeting to other
+countries (`buena_preview_signal_geo_clones`, then
+`buena_create_signal_geo_clones`), read
+[reference/grow-signals.md](reference/grow-signals.md) first: each confirming
+call resends the full previewed input, not just the `operationId`.
 
 ## Campaigns
 
@@ -241,7 +235,8 @@ optional `dataDrivenOutcomes`, `businessUnit`, `internalProductName`.
    results become a separate draft ("owner — signal title — date"), so people
    from three signals make three drafts: say so.
 4. After a yes, `buena_create_campaign_from_signal_results` with `signalId`,
-   `productId`, `resultIds` and `selectionConfirmed: true`.
+   `productId`, `resultIds`, the chosen `emailLookupMode` and
+   `selectionConfirmed: true`.
 5. Poll `buena_get_campaign_creation_status` with the same `signalId` and
    `resultIds` until the draft exists (it also returns lead IDs), then show
    `buena_get_campaign`. If the create call failed or timed out, check status
@@ -270,8 +265,9 @@ DRAFT, ACTIVE or PAUSED campaign of the same owner and product, from
 For prospects the user already has (CSV, spreadsheet, CRM export, pasted list)
 or members found with research. No signals, enrichment or credits.
 
-1. Normalize up to 500 rows. Every row needs an email if email is a channel
-   and a LinkedIn profile URL if LinkedIn is.
+1. Normalize up to 500 rows, or 10 or fewer if your model will write the
+   drafts (see "Write drafts with your own model"). Every row needs an email
+   if email is a channel and a LinkedIn profile URL if LinkedIn is.
 2. Choose product, name, brief (audience, objective, offer, facts, tone),
    senders and schedule: active mailboxes from `buena_list_email_senders`
    and, in managed workspaces, `workspace_account` user IDs from
@@ -289,26 +285,10 @@ The campaign starts with no sequence steps (see "Fit the plan").
 
 ### Fractional SDRs (managed)
 
-Buena's fractional SDRs send LinkedIn outreach from their own profiles to the
-user's list or a draft's leads. List them with `buena_list_fractional_sdrs`,
-let the user choose, and show owner, SDRs, brief and counts before each call.
-
-- **New LinkedIn campaign from a list:** after a yes,
-  `buena_create_fractional_sdr_campaign` with a UUID `idempotencyKey`,
-  `name`, `campaignBrief`, `prospects` (each with `linkedinUrl`),
-  `senderProfileIds`, optional `productId` and `settings`, and
-  `selectionConfirmed: true`.
-- **Add LinkedIn to an email draft** that already has its email sequence and
-  a connected mailbox: after a yes, `buena_attach_fractional_sdr_to_campaign`
-  with a UUID `idempotencyKey`, `campaignId`, `campaignBrief`,
-  `senderProfileIds` and `selectionConfirmed: true`. It uses every lead with
-  a LinkedIn URL; show the lead and LinkedIn-eligible counts.
-- **Replace SDRs on a draft:**
-  `buena_preview_fractional_sdr_campaign_reassignment` with `campaignId` and
-  the exact final `senderProfileIds` (not an addition); show current, added,
-  removed and final SDRs. After a yes, `buena_reassign_fractional_sdr_campaign`
-  with the same `campaignId` and `senderProfileIds`, the preview's
-  `expectedRevision`, a UUID `idempotencyKey`, and `reassignmentConfirmed: true`.
+Buena's fractional SDRs send LinkedIn outreach from their own profiles
+(`buena_list_fractional_sdrs`). To start a LinkedIn campaign from a list with
+them, add them to an email draft, or replace them on a draft, read
+[reference/fractional-sdrs.md](reference/fractional-sdrs.md) first.
 
 ### Senders (managed)
 
@@ -351,6 +331,12 @@ the user only about approach, goal, threading and research:
   written. `emailCount` 0 with `linkedInLevel` 0 is refused.
 - Emails need a mailbox on the campaign and LinkedIn copy a LinkedIn sender
   or fractional SDR: add senders first.
+- A campaign from signal results whose people have LinkedIn URLs usually has
+  LinkedIn steps (EMAIL, LINKEDIN_CONNECT, EMAIL, LINKEDIN_MESSAGE, EMAIL)
+  and no LinkedIn sender. Your model can't drop those steps and no tool
+  removes one. If the user has no LinkedIn sender or wants email only, use
+  Buena-hosted generation with `linkedInLevel` 0, which rebuilds the
+  sequence, or generate from the campaign page in the Buena app.
 
 Prepare refuses a mismatch with the fix ("Set emailCount to 3"); apply it. A
 managed campaign with no steps (from the user's own list) can't take drafts
@@ -362,20 +348,30 @@ its first save; later batches reuse that plan.
 
 1. `buena_prepare_client_personalization_preview` (draft or paused campaigns)
    with `campaignId`, a `plan` that fits `sequenceSteps`, and up to 10
-   `leadIds` (omit for the first ten leads; IDs come from
-   `buena_get_campaign_creation_status` or `buena_list_campaign_drafts`).
+   `leadIds`. Without `leadIds` it always prepares the same first ten leads
+   (by ID), and lead IDs come only from `buena_get_campaign_creation_status`
+   (signal campaigns) and `buena_list_campaign_drafts` (leads with drafts).
+   So a campaign from the user's own list gets your model's drafts for its
+   first ten leads only, and once a batch is saved, never prepare without
+   `leadIds` again (it would replace those drafts). Split bigger lists into
+   campaigns of ten or fewer, or (members) use "Drafts written outside
+   Buena" (up to 25 drafts per batch).
 2. For each task, write the draft yourself: `prompt.system` is the rules and
    output format, `prompt.user` the input. Keep the raw JSON output unchanged.
 3. `buena_validate_client_personalization_preview` with `campaignId`, the
    same `plan`, `contextReceipt` and `outputs` (`[{leadId, text}]`, one per
    prepared lead); no task bundle.
 4. Show the full preview and every quality warning. Warnings are advice:
-   don't regenerate on your own; revise once if the user asks.
+   don't regenerate on your own; revise once if the user asks. But if a
+   lead's `quality.blocking` is true, Buena won't save that batch (422
+   `quality_hold`): say so, revise that lead's draft once with the user's
+   agreement, and validate and show it again before asking to save.
 5. After the user approves, `buena_persist_client_personalization_drafts`
    with the same `campaignId`, `plan`, `contextReceipt` and `outputs`, plus
    `persistConfirmed: true`. It replaces unsent drafts for those leads, is
    refused (409) for a lead with delivery history, and returns 400
-   `sequence_mismatch` if the plan no longer fits. Repeat per batch of ten.
+   `sequence_mismatch` if the plan no longer fits. Repeat with the next ten
+   `leadIds`.
 6. Show the saved drafts with `buena_list_campaign_drafts`.
 
 ### Buena-hosted generation (managed)
@@ -387,8 +383,9 @@ After the user approves, `buena_generate_campaign_personalization` with
 `campaignId`, the identical `plan`, the `previewReceipt` and `confirmed: true`
 builds the sequence from the plan and replaces the email sequence and unsent
 drafts for every lead; follow it with `buena_get_personalization_progress`.
-If Buena says custom outreach objective access is required, the user can
-generate from the campaign page in the Buena app instead.
+Without custom outreach objective access Buena refuses the generate call
+(403), even after a preview succeeded; then the user generates from the
+campaign page in the Buena app instead.
 
 ### 1st-degree connections
 
@@ -401,8 +398,9 @@ and discards unsent connection-request drafts. Buena refuses (409) unless the
 campaign is an idle draft, every LinkedIn lead is a recorded 1st-degree
 connection of one person, and any attached LinkedIn sender is that person;
 fractional SDRs and approved or sent connection requests block it. A refusal
-names the blocking leads: remove them or keep the connection request. Then
-prepare with `linkedInLevel` 2.
+names the blocking leads: the user removes them in the Buena app (no tool
+removes leads), or keeps the connection request. Then prepare with
+`linkedInLevel` 2.
 
 ### Edit drafts (managed)
 
@@ -425,23 +423,29 @@ Buena app instead ([reference/membership.md](reference/membership.md)).
 **Check readiness.** "Which are ready to launch?": `buena_list_campaigns`
 with `status` DRAFT, then `buena_get_campaign_delivery_status` (`campaignId`)
 for leads, pending emails (`drafts.pendingApproval`), senders, schedule and
-`managedLinkedIn.readyToActivate`. Check for an active sender on every
-channel and, for 1st-degree audiences, no connection-request step.
+`managedLinkedIn.readyToActivate`. "Not found for this campaign owner" means
+a teammate's campaign: leave it out (managers can pass its owner's
+`ownerEmail`). Check for an active sender on every channel and, for
+1st-degree audiences, no connection-request step.
 
 **Email campaigns** (with or without fractional SDRs):
 
 1. With no pending emails, say so and don't launch: approving nothing doesn't
    activate a campaign. Drafts saved from your own model are not pending emails
    here; the user approves those on the campaign page in the Buena app.
-2. Show the campaign, pending email count, senders and schedule. Pending
-   emails can include the starter email Buena writes from the product for each
-   lead of a new signal campaign that wasn't personalized; say so.
-3. After the user explicitly approves, `buena_approve_and_activate_campaign`
-   with `campaignId`, a UUID `idempotencyKey`, `approvalConfirmed: true`, and
-   `approveAll: true` (they approved every pending email) or the exact
-   `draftIds` they approved (pending email IDs, not the draft IDs from
-   `buena_list_campaign_drafts`). Reuse the key on retry; a new key is a new
-   launch.
+2. In a draft campaign Buena refuses to launch (409, "Draft approval is
+   blocked until generation has finished...") until every lead has a saved
+   draft, clear of quality holds, for every step; Buena's starter emails
+   alone can't launch it. Personalize first. In an active campaign that got
+   new leads (`targetCampaignId`), pending emails can be Buena's starter
+   email for those leads; say so.
+3. Show the campaign, pending email count, senders and schedule. After the
+   user explicitly approves, `buena_approve_and_activate_campaign` with
+   `campaignId`, a UUID `idempotencyKey`, `approvalConfirmed: true` and
+   `approveAll: true`. No tool returns pending email IDs, so `draftIds` isn't
+   usable here (draft IDs from `buena_list_campaign_drafts` don't match): to
+   approve only some emails, the user does it on the campaign page in the
+   Buena app. Reuse the key on retry; a new key is a new launch.
 
 **LinkedIn-only fractional SDR campaigns:** show the owner, campaign,
 LinkedIn-eligible lead count, SDRs and schedule. After a yes,
