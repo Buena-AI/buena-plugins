@@ -1,0 +1,921 @@
+{
+  "server": {
+    "name": "buena-ai",
+    "version": "0.8.0"
+  },
+  "endpoint": "https://mcp.buena.ai/mcp",
+  "counts": {
+    "managed": 51,
+    "membership": 20,
+    "legacy": 59
+  },
+  "tools": {
+    "buena_activate_fractional_sdr_campaign": {
+      "readOnly": false,
+      "required": [
+        "activationConfirmed",
+        "campaignId",
+        "idempotencyKey"
+      ],
+      "optional": [
+        "ownerEmail"
+      ],
+      "workspaces": [
+        "legacy",
+        "managed"
+      ]
+    },
+    "buena_add_email_senders_to_campaign": {
+      "readOnly": false,
+      "required": [
+        "campaignId",
+        "emailAddresses",
+        "selectionConfirmed"
+      ],
+      "optional": [
+        "ownerEmail"
+      ],
+      "workspaces": [
+        "legacy",
+        "managed"
+      ]
+    },
+    "buena_add_linkedin_senders_to_campaign": {
+      "readOnly": false,
+      "required": [
+        "campaignId",
+        "selectionConfirmed",
+        "senderUserIds"
+      ],
+      "optional": [
+        "ownerEmail"
+      ],
+      "workspaces": [
+        "legacy",
+        "managed"
+      ]
+    },
+    "buena_add_people_to_signal": {
+      "readOnly": false,
+      "required": [
+        "confirmed",
+        "people",
+        "signalId"
+      ],
+      "optional": [
+        "ownerEmail"
+      ],
+      "workspaces": [
+        "legacy",
+        "managed"
+      ]
+    },
+    "buena_approve_and_activate_campaign": {
+      "readOnly": false,
+      "required": [
+        "approvalConfirmed",
+        "campaignId",
+        "idempotencyKey"
+      ],
+      "optional": [
+        "approveAll",
+        "draftIds",
+        "ownerEmail"
+      ],
+      "workspaces": [
+        "legacy",
+        "managed"
+      ]
+    },
+    "buena_attach_fractional_sdr_to_campaign": {
+      "readOnly": false,
+      "required": [
+        "campaignBrief",
+        "campaignId",
+        "idempotencyKey",
+        "selectionConfirmed"
+      ],
+      "optional": [
+        "ownerEmail",
+        "requireEmailReady",
+        "senderProfileId",
+        "senderProfileIds"
+      ],
+      "workspaces": [
+        "legacy",
+        "managed"
+      ]
+    },
+    "buena_cancel_signal_enrichment": {
+      "readOnly": false,
+      "required": [
+        "cancellationConfirmed",
+        "idempotencyKey",
+        "resultIds",
+        "signalId"
+      ],
+      "optional": [
+        "ownerEmail",
+        "reason"
+      ],
+      "workspaces": [
+        "legacy",
+        "managed"
+      ]
+    },
+    "buena_create_campaign_from_customer_list": {
+      "readOnly": false,
+      "required": [
+        "campaignBrief",
+        "idempotencyKey",
+        "name",
+        "productId",
+        "prospects",
+        "selectionConfirmed"
+      ],
+      "optional": [
+        "emailAddresses",
+        "linkedInSenderUserIds",
+        "ownerEmail",
+        "settings"
+      ],
+      "workspaces": [
+        "legacy",
+        "managed",
+        "membership"
+      ]
+    },
+    "buena_create_campaign_from_signal_results": {
+      "readOnly": false,
+      "required": [
+        "productId",
+        "resultIds",
+        "selectionConfirmed",
+        "signalId"
+      ],
+      "optional": [
+        "emailLookupMode",
+        "ownerEmail"
+      ],
+      "workspaces": [
+        "legacy",
+        "managed"
+      ]
+    },
+    "buena_create_fractional_sdr_campaign": {
+      "readOnly": false,
+      "required": [
+        "campaignBrief",
+        "idempotencyKey",
+        "name",
+        "prospects",
+        "selectionConfirmed"
+      ],
+      "optional": [
+        "ownerEmail",
+        "productId",
+        "senderProfileId",
+        "senderProfileIds",
+        "settings"
+      ],
+      "workspaces": [
+        "legacy",
+        "managed"
+      ]
+    },
+    "buena_create_product": {
+      "readOnly": false,
+      "required": [
+        "companyName",
+        "idealCompanyDescription",
+        "name",
+        "painPoints",
+        "productInformation"
+      ],
+      "optional": [
+        "businessUnit",
+        "dataDrivenOutcomes",
+        "internalProductName"
+      ],
+      "workspaces": [
+        "legacy",
+        "managed",
+        "membership"
+      ]
+    },
+    "buena_create_signal": {
+      "readOnly": false,
+      "required": [
+        "confirmed",
+        "query",
+        "title"
+      ],
+      "optional": [
+        "criteria",
+        "description",
+        "enrichments",
+        "monitorBehavior",
+        "monitorCadence",
+        "ownerEmail",
+        "resultCount",
+        "signalTypes",
+        "timezone"
+      ],
+      "workspaces": [
+        "legacy",
+        "managed"
+      ]
+    },
+    "buena_create_signal_geo_clones": {
+      "readOnly": false,
+      "required": [
+        "confirmed",
+        "sourceGeography",
+        "sourceSignalId",
+        "targets"
+      ],
+      "optional": [
+        "operationId",
+        "ownerEmail",
+        "prospectCount",
+        "sourceLanguages"
+      ],
+      "workspaces": [
+        "legacy",
+        "managed"
+      ]
+    },
+    "buena_expand_signal_to_target": {
+      "readOnly": false,
+      "required": [
+        "confirmed",
+        "signalIds"
+      ],
+      "optional": [
+        "operationId",
+        "ownerEmail",
+        "targetResultCount"
+      ],
+      "workspaces": [
+        "legacy",
+        "managed"
+      ]
+    },
+    "buena_find_people": {
+      "readOnly": true,
+      "required": [
+        "query"
+      ],
+      "optional": [
+        "criteria",
+        "limit"
+      ],
+      "workspaces": [
+        "legacy",
+        "managed"
+      ]
+    },
+    "buena_generate_campaign_personalization": {
+      "readOnly": false,
+      "required": [
+        "campaignId",
+        "confirmed",
+        "plan",
+        "previewReceipt"
+      ],
+      "optional": [],
+      "workspaces": [
+        "legacy",
+        "managed"
+      ]
+    },
+    "buena_get_campaign": {
+      "readOnly": true,
+      "required": [
+        "campaignId"
+      ],
+      "optional": [
+        "ownerEmail"
+      ],
+      "workspaces": [
+        "legacy",
+        "managed",
+        "membership"
+      ]
+    },
+    "buena_get_campaign_creation_status": {
+      "readOnly": true,
+      "required": [
+        "resultIds",
+        "signalId"
+      ],
+      "optional": [
+        "ownerEmail"
+      ],
+      "workspaces": [
+        "legacy",
+        "managed"
+      ]
+    },
+    "buena_get_campaign_delivery_status": {
+      "readOnly": true,
+      "required": [
+        "campaignId"
+      ],
+      "optional": [
+        "ownerEmail"
+      ],
+      "workspaces": [
+        "legacy",
+        "managed"
+      ]
+    },
+    "buena_get_personalization_progress": {
+      "readOnly": true,
+      "required": [
+        "campaignId"
+      ],
+      "optional": [
+        "ownerEmail"
+      ],
+      "workspaces": [
+        "legacy",
+        "managed"
+      ]
+    },
+    "buena_get_product": {
+      "readOnly": true,
+      "required": [
+        "productId"
+      ],
+      "optional": [],
+      "workspaces": [
+        "legacy",
+        "managed",
+        "membership"
+      ]
+    },
+    "buena_get_signal": {
+      "readOnly": true,
+      "required": [
+        "signalId"
+      ],
+      "optional": [
+        "ownerEmail"
+      ],
+      "workspaces": [
+        "legacy",
+        "managed"
+      ]
+    },
+    "buena_list_campaign_drafts": {
+      "readOnly": true,
+      "required": [
+        "campaignId"
+      ],
+      "optional": [
+        "limit",
+        "offset",
+        "status"
+      ],
+      "workspaces": [
+        "legacy",
+        "managed",
+        "membership"
+      ]
+    },
+    "buena_list_campaigns": {
+      "readOnly": true,
+      "required": [],
+      "optional": [
+        "limit",
+        "offset",
+        "status"
+      ],
+      "workspaces": [
+        "legacy",
+        "managed",
+        "membership"
+      ]
+    },
+    "buena_list_email_senders": {
+      "readOnly": true,
+      "required": [],
+      "optional": [
+        "ownerEmail"
+      ],
+      "workspaces": [
+        "legacy",
+        "managed",
+        "membership"
+      ]
+    },
+    "buena_list_fractional_sdrs": {
+      "readOnly": true,
+      "required": [],
+      "optional": [
+        "ownerEmail"
+      ],
+      "workspaces": [
+        "legacy",
+        "managed"
+      ]
+    },
+    "buena_list_linkedin_senders": {
+      "readOnly": true,
+      "required": [],
+      "optional": [
+        "ownerEmail"
+      ],
+      "workspaces": [
+        "legacy",
+        "managed"
+      ]
+    },
+    "buena_list_products": {
+      "readOnly": true,
+      "required": [],
+      "optional": [],
+      "workspaces": [
+        "legacy",
+        "managed",
+        "membership"
+      ]
+    },
+    "buena_list_signal_results": {
+      "readOnly": true,
+      "required": [
+        "signalId"
+      ],
+      "optional": [
+        "limit",
+        "offset",
+        "ownerEmail",
+        "status"
+      ],
+      "workspaces": [
+        "legacy",
+        "managed"
+      ]
+    },
+    "buena_list_signals": {
+      "readOnly": true,
+      "required": [],
+      "optional": [
+        "category",
+        "onlyMine",
+        "ownerEmail",
+        "status"
+      ],
+      "workspaces": [
+        "legacy",
+        "managed"
+      ]
+    },
+    "buena_pause_campaign": {
+      "readOnly": false,
+      "required": [
+        "campaignId",
+        "confirmed",
+        "idempotencyKey"
+      ],
+      "optional": [
+        "ownerEmail"
+      ],
+      "workspaces": [
+        "legacy",
+        "managed"
+      ]
+    },
+    "buena_persist_client_personalization_drafts": {
+      "readOnly": false,
+      "required": [
+        "campaignId",
+        "contextReceipt",
+        "outputs",
+        "persistConfirmed",
+        "plan"
+      ],
+      "optional": [
+        "ownerEmail",
+        "taskBundle"
+      ],
+      "workspaces": [
+        "legacy",
+        "managed",
+        "membership"
+      ]
+    },
+    "buena_persist_signal_qualification": {
+      "readOnly": false,
+      "required": [
+        "contextReceipt",
+        "outputs",
+        "persistConfirmed"
+      ],
+      "optional": [
+        "overwriteExistingScores",
+        "ownerEmail",
+        "taskBundle"
+      ],
+      "workspaces": [
+        "legacy",
+        "managed"
+      ]
+    },
+    "buena_prepare_client_personalization_preview": {
+      "readOnly": true,
+      "required": [
+        "campaignId",
+        "plan"
+      ],
+      "optional": [
+        "leadIds",
+        "ownerEmail"
+      ],
+      "workspaces": [
+        "legacy",
+        "managed",
+        "membership"
+      ]
+    },
+    "buena_prepare_signal_qualification": {
+      "readOnly": true,
+      "required": [
+        "rubric",
+        "signalIds"
+      ],
+      "optional": [
+        "includeDismissed",
+        "limit",
+        "offset",
+        "ownerEmail"
+      ],
+      "workspaces": [
+        "legacy",
+        "managed"
+      ]
+    },
+    "buena_preview_campaign_personalization": {
+      "readOnly": true,
+      "required": [
+        "campaignId",
+        "plan"
+      ],
+      "optional": [
+        "leadIds",
+        "ownerEmail"
+      ],
+      "workspaces": [
+        "legacy",
+        "managed"
+      ]
+    },
+    "buena_preview_fractional_sdr_campaign_reassignment": {
+      "readOnly": true,
+      "required": [
+        "campaignId",
+        "senderProfileIds"
+      ],
+      "optional": [
+        "ownerEmail"
+      ],
+      "workspaces": [
+        "legacy",
+        "managed"
+      ]
+    },
+    "buena_preview_signal_expansion": {
+      "readOnly": true,
+      "required": [
+        "signalIds"
+      ],
+      "optional": [
+        "operationId",
+        "ownerEmail",
+        "targetResultCount"
+      ],
+      "workspaces": [
+        "legacy",
+        "managed"
+      ]
+    },
+    "buena_preview_signal_geo_clones": {
+      "readOnly": true,
+      "required": [
+        "sourceGeography",
+        "sourceSignalId",
+        "targets"
+      ],
+      "optional": [
+        "operationId",
+        "ownerEmail",
+        "prospectCount",
+        "sourceLanguages"
+      ],
+      "workspaces": [
+        "legacy",
+        "managed"
+      ]
+    },
+    "buena_ranked_signal_results": {
+      "readOnly": true,
+      "required": [
+        "rubric",
+        "signalIds"
+      ],
+      "optional": [
+        "includeDismissed",
+        "includeUnscored",
+        "limit",
+        "offset",
+        "ownerEmail"
+      ],
+      "workspaces": [
+        "legacy",
+        "managed"
+      ]
+    },
+    "buena_reassign_fractional_sdr_campaign": {
+      "readOnly": false,
+      "required": [
+        "campaignId",
+        "expectedRevision",
+        "idempotencyKey",
+        "reassignmentConfirmed",
+        "senderProfileIds"
+      ],
+      "optional": [
+        "ownerEmail"
+      ],
+      "workspaces": [
+        "legacy",
+        "managed"
+      ]
+    },
+    "buena_requeue_signal_enrichment": {
+      "readOnly": false,
+      "required": [
+        "additionalCreditSpendConfirmed",
+        "idempotencyKey",
+        "productId",
+        "resultIds",
+        "selectionConfirmed",
+        "signalId"
+      ],
+      "optional": [
+        "emailLookupMode",
+        "ownerEmail",
+        "targetCampaignId"
+      ],
+      "workspaces": [
+        "legacy",
+        "managed"
+      ]
+    },
+    "buena_resume_campaign": {
+      "readOnly": false,
+      "required": [
+        "campaignId",
+        "confirmed",
+        "idempotencyKey"
+      ],
+      "optional": [
+        "ownerEmail"
+      ],
+      "workspaces": [
+        "legacy",
+        "managed"
+      ]
+    },
+    "buena_search_connections": {
+      "readOnly": false,
+      "required": [
+        "confirmed"
+      ],
+      "optional": [
+        "connectionDegree",
+        "currentCompany",
+        "cursor",
+        "geography",
+        "keywords",
+        "limit",
+        "newSignalTitle",
+        "ownerEmail",
+        "savedSearchId",
+        "signalId",
+        "titles"
+      ],
+      "workspaces": [
+        "legacy",
+        "managed"
+      ]
+    },
+    "buena_status": {
+      "readOnly": true,
+      "required": [],
+      "optional": [],
+      "workspaces": [
+        "legacy",
+        "managed",
+        "membership"
+      ]
+    },
+    "buena_update_campaign_draft": {
+      "readOnly": false,
+      "required": [
+        "campaignId",
+        "draftId"
+      ],
+      "optional": [
+        "bodyText",
+        "connectionNote",
+        "subject",
+        "voiceScript"
+      ],
+      "workspaces": [
+        "legacy",
+        "managed"
+      ]
+    },
+    "buena_update_campaign_sequence_step": {
+      "readOnly": false,
+      "required": [
+        "campaignId",
+        "stepPosition"
+      ],
+      "optional": [
+        "delayDays",
+        "emailThreading"
+      ],
+      "workspaces": [
+        "legacy",
+        "managed"
+      ]
+    },
+    "buena_update_signal": {
+      "readOnly": false,
+      "required": [
+        "confirmed",
+        "signalId"
+      ],
+      "optional": [
+        "criteria",
+        "description",
+        "monitorBehavior",
+        "monitorCadence",
+        "ownerEmail",
+        "query",
+        "resultCount",
+        "timezone",
+        "title"
+      ],
+      "workspaces": [
+        "legacy",
+        "managed"
+      ]
+    },
+    "buena_use_first_degree_linkedin_messages": {
+      "readOnly": false,
+      "required": [
+        "campaignId",
+        "confirmed"
+      ],
+      "optional": [
+        "ownerEmail"
+      ],
+      "workspaces": [
+        "legacy",
+        "managed"
+      ]
+    },
+    "buena_validate_client_personalization_preview": {
+      "readOnly": true,
+      "required": [
+        "campaignId",
+        "contextReceipt",
+        "outputs",
+        "plan"
+      ],
+      "optional": [
+        "ownerEmail",
+        "taskBundle"
+      ],
+      "workspaces": [
+        "legacy",
+        "managed",
+        "membership"
+      ]
+    },
+    "buena_validate_signal_qualification": {
+      "readOnly": true,
+      "required": [
+        "contextReceipt",
+        "outputs"
+      ],
+      "optional": [
+        "ownerEmail",
+        "taskBundle"
+      ],
+      "workspaces": [
+        "legacy",
+        "managed"
+      ]
+    },
+    "buena_workspace_operations": {
+      "readOnly": true,
+      "required": [],
+      "optional": [],
+      "workspaces": [
+        "legacy",
+        "membership"
+      ]
+    },
+    "buena_workspace_prepare_work": {
+      "readOnly": false,
+      "required": [
+        "accountId",
+        "workId"
+      ],
+      "optional": [],
+      "workspaces": [
+        "legacy",
+        "membership"
+      ]
+    },
+    "buena_workspace_quote": {
+      "readOnly": true,
+      "required": [
+        "action",
+        "quantity"
+      ],
+      "optional": [],
+      "workspaces": [
+        "legacy",
+        "membership"
+      ]
+    },
+    "buena_workspace_read_work": {
+      "readOnly": true,
+      "required": [],
+      "optional": [],
+      "workspaces": [
+        "legacy",
+        "membership"
+      ]
+    },
+    "buena_workspace_research": {
+      "readOnly": false,
+      "required": [
+        "confirmed",
+        "criteria",
+        "maximumCredits",
+        "operationId",
+        "quantity",
+        "query"
+      ],
+      "optional": [],
+      "workspaces": [
+        "legacy",
+        "membership"
+      ]
+    },
+    "buena_workspace_save_supplied_work": {
+      "readOnly": false,
+      "required": [
+        "operationId",
+        "work"
+      ],
+      "optional": [],
+      "workspaces": [
+        "legacy",
+        "membership"
+      ]
+    },
+    "buena_workspace_usage": {
+      "readOnly": true,
+      "required": [],
+      "optional": [
+        "cursor"
+      ],
+      "workspaces": [
+        "legacy",
+        "membership"
+      ]
+    },
+    "buena_workspace_work_email": {
+      "readOnly": false,
+      "required": [
+        "confirmed",
+        "maximumCredits",
+        "operationId",
+        "people"
+      ],
+      "optional": [],
+      "workspaces": [
+        "legacy",
+        "membership"
+      ]
+    }
+  }
+}

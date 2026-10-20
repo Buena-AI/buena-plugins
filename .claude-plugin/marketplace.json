@@ -1,0 +1,14 @@
+{
+  "name": "buena",
+  "owner": { "name": "Buena AI", "url": "https://buena.ai" },
+  "metadata": {
+    "description": "Buena AI plugins: the Buena MCP server plus one skill for prospecting, campaigns, personalization, and launch."
+  },
+  "plugins": [
+    {
+      "name": "buena-ai",
+      "source": "./claude/buena-ai",
+      "description": "Find prospects with Buena signals or your LinkedIn network, turn them into reviewed draft campaigns, and launch only what you approve."
+    }
+  ]
+}
