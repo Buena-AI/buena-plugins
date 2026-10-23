@@ -5,9 +5,9 @@
   },
   "endpoint": "https://mcp.buena.ai/mcp",
   "counts": {
-    "managed": 57,
+    "managed": 60,
     "membership": 21,
-    "legacy": 65
+    "legacy": 68
   },
   "tools": {
     "buena_activate_fractional_sdr_campaign": {
@@ -351,6 +351,19 @@
         "managed"
       ]
     },
+    "buena_get_conversation": {
+      "readOnly": true,
+      "required": [
+        "conversationId"
+      ],
+      "optional": [
+        "ownerEmail"
+      ],
+      "workspaces": [
+        "legacy",
+        "managed"
+      ]
+    },
     "buena_get_personalization_progress": {
       "readOnly": true,
       "required": [
@@ -433,6 +446,22 @@
         "legacy",
         "managed",
         "membership"
+      ]
+    },
+    "buena_list_conversations": {
+      "readOnly": true,
+      "required": [],
+      "optional": [
+        "awaitingReplyOnly",
+        "channel",
+        "days",
+        "limit",
+        "offset",
+        "ownerEmail"
+      ],
+      "workspaces": [
+        "legacy",
+        "managed"
       ]
     },
     "buena_list_email_senders": {
@@ -787,6 +816,23 @@
         "savedSearchId",
         "signalId",
         "titles"
+      ],
+      "workspaces": [
+        "legacy",
+        "managed"
+      ]
+    },
+    "buena_send_reply": {
+      "readOnly": false,
+      "required": [
+        "body",
+        "conversationId",
+        "idempotencyKey",
+        "sendConfirmed"
+      ],
+      "optional": [
+        "ownerEmail",
+        "subject"
       ],
       "workspaces": [
         "legacy",

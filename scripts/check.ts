@@ -379,6 +379,9 @@ const CONTENT_RULES: { include?: RegExp[]; exclude?: RegExp[]; near?: [string, R
     ["buena_remove_email_senders_from_campaign", /\byes\b/],
     ["buena_remove_linkedin_senders_from_campaign", /\byes\b/],
     ["buena_set_linkedin_timing", /\byes\b/],
+    ["buena_send_reply", /\byes\b/],
+    ["buena_send_reply", /send_outcome_unknown/],
+    ["buena_get_conversation", /as data/],
   ],
 };
 
