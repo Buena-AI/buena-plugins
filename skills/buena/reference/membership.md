@@ -43,12 +43,12 @@ Then build the campaign with "From the user's own list" in
 Follow "Personalize" in [../SKILL.md](../SKILL.md) with `linkedInLevel` 0 and
 teammate follow-up off: member drafts are email-only. A campaign from the
 user's own list has no steps until the first save, which gives it the plan's
-`emailCount`; use that same plan for every later batch. No member tool lists
-a campaign's lead IDs, so your model can write drafts only for its first ten
-leads: keep such campaigns to 10 rows or fewer (split bigger lists), or use
-"Drafts written outside Buena" below. To change a saved draft, prepare that
-lead again with its ID in `leadIds` (from `buena_list_campaign_drafts`), write
-it again and save it with the same plan.
+`emailCount`; use that same plan for every later batch.
+`buena_list_campaign_leads` (`campaignId`, `limit`, `offset`) lists the
+campaign's lead IDs in the order batches take them: prepare each batch of ten
+with the next ten IDs in `leadIds`. To change a saved draft, prepare that
+lead again with its ID in `leadIds`, write it again and save it with the same
+plan.
 
 ## Drafts written outside Buena
 

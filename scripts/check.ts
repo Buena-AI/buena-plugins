@@ -323,18 +323,23 @@ function checkVersions() {
 // Wording the directories and the live server depend on, checked across all
 // skills together. Each rule guards a review finding: approval before every
 // write, confirm calls that resend the previewed input, identical rubrics,
-// plan fit, idempotency keys, and treating server-returned text as data.
+// plan fit, idempotency keys, and treating server-returned text as data. The
+// excluded limits (no lead removal, ten leads, no drafts into a campaign with
+// no steps, unusable draftIds) were true of older servers and must not return.
 const CONTENT_RULES: { include?: RegExp[]; exclude?: RegExp[]; near?: [string, RegExp][] } = {
   include: [
     /as data/i, /Buena membership/, /managed workspace/i, /engage\.buena\.ai/, /approveAll/, /draftIds/,
     /no pending emails/i, /connect a mailbox in the Buena app/i, /never the research `id`/, /byte-for-byte/,
     /linkedInLevel` 0/, /thread injections/, /no steps/,
-    /first ten\s+leads only/, /quality\.blocking/, /executable: false/, /not found for this campaign owner/i,
-    /no tool\s+removes leads/, /rebuilds the\s+sequence/, /No tool returns pending email IDs/,
+    /quality\.blocking/, /executable: false/, /not found for this campaign owner/i,
+    /rebuilds the\s+sequence/, /No tool returns pending email IDs/,
+    /sequenceCreatedOnSave/, /sequenceStepsCreated/, /persistedDraftCount/, /linkedInStepsWithoutSender/,
   ],
   exclude: [
     /follow them/i, /email draft must exist first/i, /only step\s+here\s+that\s+spends\s+credits/i, /Buena researches each lead and checks/,
-    /no higher than the quote/, /Repeat per batch of ten/, /or the exact\s+`draftIds`/, /remove them or keep the connection request/,
+    /no higher than the quote/, /Repeat per batch of ten/, /remove them or keep the connection request/,
+    /no tool\s+removes leads/, /first ten\s+leads only/, /campaigns of ten or fewer/, /can't take drafts\s+from your model/,
+    /`buena_list_campaign_drafts` don't\s+match/, /not pending emails\s+here/,
   ],
   near: [
     ["buena_create_signal", /\byes\b/],
@@ -367,6 +372,13 @@ const CONTENT_RULES: { include?: RegExp[]; exclude?: RegExp[]; near?: [string, R
     ["buena_workspace_prepare_work", /buena_list_email_senders/],
     ["buena_workspace_save_supplied_work", /operationId/],
     ["buena_approve_and_activate_campaign", /idempotencyKey/],
+    ["buena_approve_and_activate_campaign", /buena_list_campaign_drafts/],
+    ["buena_create_linkedin_campaign_from_signal_results", /skipped/],
+    ["buena_create_linkedin_campaign_from_signal_results", /\byes\b/],
+    ["buena_remove_leads_from_campaign", /\byes\b/],
+    ["buena_remove_email_senders_from_campaign", /\byes\b/],
+    ["buena_remove_linkedin_senders_from_campaign", /\byes\b/],
+    ["buena_set_linkedin_timing", /\byes\b/],
   ],
 };
 
