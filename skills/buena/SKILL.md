@@ -246,6 +246,23 @@ The owner's active mailboxes are attached automatically. If every LinkedIn
 lead is a recorded 1st-degree connection (as from `buena_search_connections`),
 the campaign gets direct LinkedIn messages instead of connection requests.
 
+**LinkedIn only, no email lookup.** People the lookup finds no email for never
+become leads, and people the user wants to reach only on LinkedIn need no
+lookup at all. `buena_create_linkedin_campaign_from_signal_results` makes them
+LinkedIn-only leads from their profiles, with no credits spent, and lists
+anyone it can't add in `skipped` with the reason: show those. Show the people,
+product and LinkedIn sender; after a yes, call it with a UUID
+`idempotencyKey`, `signalId`, `productId`, `resultIds` (one signal, up to
+100), `selectionConfirmed: true`, and either `linkedInSenderUserIds`
+(`workspace_account` IDs from `buena_list_linkedin_senders`) for a new draft
+or `targetCampaignId` for an idle draft of the same owner and product that has
+no email steps or mailboxes. It skips people with no LinkedIn profile, people
+already leads or in an active or paused campaign, and people whose email
+lookup is still running (the user can cancel it first). When every person is
+a recorded 1st-degree connection of the one sender, who ran the search, the
+draft uses direct messages (`linkedinAudience` `first_degree`). The draft
+starts with no sequence steps (see "Fit the plan").
+
 **Stop enrichment:** show the owner, signal, result count and batch IDs, and
 that credits a provider already spent aren't refunded. After a yes,
 `buena_cancel_signal_enrichment` with a UUID `idempotencyKey`, `signalId`,
@@ -265,9 +282,9 @@ DRAFT, ACTIVE or PAUSED campaign of the same owner and product, from
 For prospects the user already has (CSV, spreadsheet, CRM export, pasted list)
 or members found with research. No signals, enrichment or credits.
 
-1. Normalize up to 500 rows, or 10 or fewer if your model will write the
-   drafts (see "Write drafts with your own model"). Every row needs an email
-   if email is a channel and a LinkedIn profile URL if LinkedIn is.
+1. Normalize up to 500 rows. Every row needs an email if email is a channel
+   and a LinkedIn profile URL if LinkedIn is; a LinkedIn-only list (no
+   `emailAddresses`) needs no emails.
 2. Choose product, name, brief (audience, objective, offer, facts, tone),
    senders and schedule: active mailboxes from `buena_list_email_senders`
    and, in managed workspaces, `workspace_account` user IDs from
@@ -290,20 +307,40 @@ Buena's fractional SDRs send LinkedIn outreach from their own profiles
 them, add them to an email draft, or replace them on a draft, read
 [reference/fractional-sdrs.md](reference/fractional-sdrs.md) first.
 
-### Senders (managed)
+### Leads and senders (managed)
 
+- **Leads:** `buena_list_campaign_leads` (`campaignId`, `limit` up to 500,
+  `offset`) lists every lead with its ID, in the order personalization takes
+  them; `email` is null for LinkedIn-only leads. To drop people from an idle
+  draft, show them; after a yes, `buena_remove_leads_from_campaign` with
+  `campaignId`, `leadIds` and `removalConfirmed: true`. It also deletes their
+  unsent drafts and lists back any ID that wasn't in the campaign. A started
+  campaign keeps its leads: to stop outreach to someone, the user pauses that
+  lead's automation in the Buena app.
 - **Email:** `buena_list_email_senders` shows mailboxes, status and whether
   the user may use each; only active ones count. After a yes,
   `buena_add_email_senders_to_campaign` with `campaignId`, `emailAddresses`
   and `selectionConfirmed: true`. On an active or paused campaign it moves
   eligible unsent emails to the new mailboxes (new sender, signature and
   schedule); say so.
+- **Remove a mailbox:** after a yes, `buena_remove_email_senders_from_campaign`
+  with `campaignId`, `emailAddresses` and `selectionConfirmed: true`. Only an
+  idle draft loses mailboxes, and its unsent email moves to the remaining
+  ones; a campaign with email steps keeps at least one, and once a campaign
+  has started its senders can only be added to.
 - **LinkedIn:** `buena_list_linkedin_senders` separates `workspace_account`
   senders from `managed_fractional_sdr` profiles; an empty managed list
   doesn't mean there are no workspace accounts. After a yes,
   `buena_add_linkedin_senders_to_campaign` with `campaignId`, `senderUserIds`
   (workspace accounts) and `selectionConfirmed: true`. The two kinds can't be
   mixed in one campaign.
+- **Remove a LinkedIn account:** after a yes,
+  `buena_remove_linkedin_senders_from_campaign` with `campaignId`,
+  `senderUserIds` and `selectionConfirmed: true`, on an idle draft before any
+  LinkedIn outreach is dispatched; leads move to the remaining accounts. If it
+  reports `linkedInStepsWithoutSender`, add a sender before launch.
+  Fractional SDRs change through reassignment instead
+  ([reference/fractional-sdrs.md](reference/fractional-sdrs.md)).
 
 ## Personalize
 
@@ -326,7 +363,8 @@ numbers from `sequenceSteps` in `buena_get_campaign` instead of asking; ask
 the user only about approach, goal, threading and research:
 
 - `emailCount` = EMAIL steps that are not thread injections.
-- LINKEDIN_MESSAGE steps need `linkedInLevel` 2 (at most two such steps); a
+- LINKEDIN_MESSAGE steps need `linkedInLevel` 2 (at most two such steps), and
+  `linkedInLevel` 2 needs at least one LINKEDIN_MESSAGE step to write into; a
   LINKEDIN_CONNECT step needs 1 or more, and only then is a connection note
   written. `emailCount` 0 with `linkedInLevel` 0 is refused.
 - Emails need a mailbox on the campaign and LinkedIn copy a LinkedIn sender
@@ -339,23 +377,24 @@ the user only about approach, goal, threading and research:
   sequence, or generate from the campaign page in the Buena app.
 
 Prepare refuses a mismatch with the fix ("Set emailCount to 3"); apply it. A
-managed campaign with no steps (from the user's own list) can't take drafts
-from your model: use Buena-hosted generation, which builds the sequence, or
-the Buena app. A membership campaign with no steps takes the plan's shape on
-its first save; later batches reuse that plan.
+draft with no steps (from the user's own list, or LinkedIn-only from signal
+results) takes the plan's shape on its first save: prepare returns the steps
+that save will create as `sequenceCreatedOnSave`, and every later batch must
+use the same plan. In a managed workspace that plan allows `linkedInLevel` up
+to 2 and no teammate follow-up, and a 1st-degree audience gets direct
+messages instead of the connection request. A LinkedIn-only draft takes
+`emailCount` 0 and `linkedInLevel` 2: two direct messages for 1st-degree
+connections, otherwise a connection request and one message.
 
 ### Write drafts with your own model (default)
 
 1. `buena_prepare_client_personalization_preview` (draft or paused campaigns)
-   with `campaignId`, a `plan` that fits `sequenceSteps`, and up to 10
-   `leadIds`. Without `leadIds` it always prepares the same first ten leads
-   (by ID), and lead IDs come only from `buena_get_campaign_creation_status`
-   (signal campaigns) and `buena_list_campaign_drafts` (leads with drafts).
-   So a campaign from the user's own list gets your model's drafts for its
-   first ten leads only, and once a batch is saved, never prepare without
-   `leadIds` again (it would replace those drafts). Split bigger lists into
-   campaigns of ten or fewer, or (members) use "Drafts written outside
-   Buena" (up to 25 drafts per batch).
+   with `campaignId`, a `plan` that fits `sequenceSteps` (or, with no steps
+   yet, the plan the draft will keep), and up to 10 `leadIds`. Without
+   `leadIds` it always prepares the same first ten leads (by ID);
+   `buena_list_campaign_leads` lists every lead ID in that same order, so take
+   the next ten IDs for each batch. Once a batch is saved, never prepare
+   without `leadIds` again (it would replace those drafts).
 2. For each task, write the draft yourself: `prompt.system` is the rules and
    output format, `prompt.user` the input. Keep the raw JSON output unchanged.
 3. `buena_validate_client_personalization_preview` with `campaignId`, the
@@ -370,8 +409,10 @@ its first save; later batches reuse that plan.
    with the same `campaignId`, `plan`, `contextReceipt` and `outputs`, plus
    `persistConfirmed: true`. It replaces unsent drafts for those leads, is
    refused (409) for a lead with delivery history, and returns 400
-   `sequence_mismatch` if the plan no longer fits. Repeat with the next ten
-   `leadIds`.
+   `sequence_mismatch` if the plan no longer fits. On a draft with no steps,
+   the first save creates them and returns them as `sequenceStepsCreated`.
+   Copy with no step to hold it is refused, never saved as nothing: check
+   `persistedDraftCount`. Repeat with the next ten `leadIds`.
 6. Show the saved drafts with `buena_list_campaign_drafts`.
 
 ### Buena-hosted generation (managed)
@@ -391,16 +432,24 @@ campaign page in the Buena app instead.
 
 A connection request can't go to someone already connected. Campaigns built
 from all-1st-degree signal results get direct messages automatically (check
-`sequenceSteps`). For other drafts, before preparing personalization and after
-a yes, run `buena_use_first_degree_linkedin_messages` with `campaignId` and
+`sequenceSteps`, or `linkedinAudience` from the LinkedIn-only tool). For other
+drafts, before preparing personalization and after a yes, run
+`buena_use_first_degree_linkedin_messages` with `campaignId` and
 `confirmed: true`. It swaps each connection-request step for a direct message
-and discards unsent connection-request drafts. Buena refuses (409) unless the
-campaign is an idle draft, every LinkedIn lead is a recorded 1st-degree
-connection of one person, and any attached LinkedIn sender is that person;
-fractional SDRs and approved or sent connection requests block it. A refusal
-names the blocking leads: the user removes them in the Buena app (no tool
-removes leads), or keeps the connection request. Then prepare with
-`linkedInLevel` 2.
+and discards unsent connection-request drafts; on a draft with no steps yet it
+only records the audience, and the first save then creates direct messages.
+Buena refuses (409) unless the campaign is an idle draft, every LinkedIn lead
+is a recorded 1st-degree connection of one person, and any attached LinkedIn
+sender is that person; fractional SDRs and approved or sent connection
+requests block it. A refusal names the blocking leads: with the user's yes,
+take them out with `buena_remove_leads_from_campaign`, or keep the connection
+request. Then prepare with `linkedInLevel` 2.
+
+1st-degree campaigns start LinkedIn right after approval; other campaigns wait
+for each LinkedIn step's day. To change that, show the choice and after a yes
+call `buena_set_linkedin_timing` with `campaignId` and `timing` (`immediately`
+or `sequence`). It works on draft, active and paused campaigns, for leads
+whose LinkedIn sequence hasn't been queued yet.
 
 ### Edit drafts (managed)
 
@@ -422,30 +471,37 @@ Buena app instead ([reference/membership.md](reference/membership.md)).
 
 **Check readiness.** "Which are ready to launch?": `buena_list_campaigns`
 with `status` DRAFT, then `buena_get_campaign_delivery_status` (`campaignId`)
-for leads, pending emails (`drafts.pendingApproval`), senders, schedule and
-`managedLinkedIn.readyToActivate`. "Not found for this campaign owner" means
-a teammate's campaign: leave it out (managers can pass its owner's
-`ownerEmail`). Check for an active sender on every channel and, for
-1st-degree audiences, no connection-request step.
+for leads, Buena's starter emails (`drafts.pendingApproval`), senders,
+schedule and `managedLinkedIn.readyToActivate`, and
+`buena_list_campaign_drafts` for reviewed drafts (`statusSummary`). "Not
+found for this campaign owner" means a teammate's campaign: leave it out
+(managers can pass its owner's `ownerEmail`). Check for an active sender on
+every channel and, for 1st-degree audiences, no connection-request step.
 
-**Email campaigns** (with or without fractional SDRs):
+**Email and LinkedIn campaigns** (the user's own mailboxes and LinkedIn
+accounts, with or without fractional SDRs):
 
-1. With no pending emails, say so and don't launch: approving nothing doesn't
-   activate a campaign. Drafts saved from your own model are not pending emails
-   here; the user approves those on the campaign page in the Buena app.
+1. With no reviewed drafts and no pending emails, say so and don't launch:
+   approving nothing doesn't activate a campaign. Drafts your own model saved
+   are reviewed drafts, and approval covers them on every channel.
 2. In a draft campaign Buena refuses to launch (409, "Draft approval is
    blocked until generation has finished...") until every lead has a saved
    draft, clear of quality holds, for every step; Buena's starter emails
-   alone can't launch it. Personalize first. In an active campaign that got
-   new leads (`targetCampaignId`), pending emails can be Buena's starter
-   email for those leads; say so.
-3. Show the campaign, pending email count, senders and schedule. After the
-   user explicitly approves, `buena_approve_and_activate_campaign` with
-   `campaignId`, a UUID `idempotencyKey`, `approvalConfirmed: true` and
-   `approveAll: true`. No tool returns pending email IDs, so `draftIds` isn't
-   usable here (draft IDs from `buena_list_campaign_drafts` don't match): to
-   approve only some emails, the user does it on the campaign page in the
-   Buena app. Reuse the key on retry; a new key is a new launch.
+   alone can't launch it. Personalize first, or, with the user's yes, remove
+   leads nobody will write for. A paused campaign must be resumed before its
+   drafts can be approved. In an active campaign that got new leads
+   (`targetCampaignId`), pending emails can be Buena's starter email for
+   those leads; say so.
+3. Show the campaign, draft and email counts, senders, schedule and LinkedIn
+   timing. After the user explicitly approves,
+   `buena_approve_and_activate_campaign` with `campaignId`, a UUID
+   `idempotencyKey`, `approvalConfirmed: true`, and either `approveAll: true`
+   (every reviewed draft on every channel, approved in the background; the
+   delivery status shows progress) or `draftIds` from
+   `buena_list_campaign_drafts` (exactly those drafts).
+   No tool returns pending email IDs, so Buena's starter emails are approved
+   only with `approveAll` or in the Buena app. Reuse the key on retry; a new
+   key is a new launch.
 
 **LinkedIn-only fractional SDR campaigns:** show the owner, campaign,
 LinkedIn-eligible lead count, SDRs and schedule. After a yes,

@@ -5,9 +5,9 @@
   },
   "endpoint": "https://mcp.buena.ai/mcp",
   "counts": {
-    "managed": 51,
-    "membership": 20,
-    "legacy": 59
+    "managed": 57,
+    "membership": 21,
+    "legacy": 65
   },
   "tools": {
     "buena_activate_fractional_sdr_campaign": {
@@ -177,6 +177,27 @@
         "senderProfileId",
         "senderProfileIds",
         "settings"
+      ],
+      "workspaces": [
+        "legacy",
+        "managed"
+      ]
+    },
+    "buena_create_linkedin_campaign_from_signal_results": {
+      "readOnly": false,
+      "required": [
+        "idempotencyKey",
+        "productId",
+        "resultIds",
+        "selectionConfirmed",
+        "signalId"
+      ],
+      "optional": [
+        "campaignBrief",
+        "linkedInSenderUserIds",
+        "name",
+        "ownerEmail",
+        "targetCampaignId"
       ],
       "workspaces": [
         "legacy",
@@ -377,6 +398,22 @@
         "limit",
         "offset",
         "status"
+      ],
+      "workspaces": [
+        "legacy",
+        "managed",
+        "membership"
+      ]
+    },
+    "buena_list_campaign_leads": {
+      "readOnly": true,
+      "required": [
+        "campaignId"
+      ],
+      "optional": [
+        "limit",
+        "offset",
+        "ownerEmail"
       ],
       "workspaces": [
         "legacy",
@@ -653,6 +690,51 @@
         "managed"
       ]
     },
+    "buena_remove_email_senders_from_campaign": {
+      "readOnly": false,
+      "required": [
+        "campaignId",
+        "emailAddresses",
+        "selectionConfirmed"
+      ],
+      "optional": [
+        "ownerEmail"
+      ],
+      "workspaces": [
+        "legacy",
+        "managed"
+      ]
+    },
+    "buena_remove_leads_from_campaign": {
+      "readOnly": false,
+      "required": [
+        "campaignId",
+        "leadIds",
+        "removalConfirmed"
+      ],
+      "optional": [
+        "ownerEmail"
+      ],
+      "workspaces": [
+        "legacy",
+        "managed"
+      ]
+    },
+    "buena_remove_linkedin_senders_from_campaign": {
+      "readOnly": false,
+      "required": [
+        "campaignId",
+        "selectionConfirmed",
+        "senderUserIds"
+      ],
+      "optional": [
+        "ownerEmail"
+      ],
+      "workspaces": [
+        "legacy",
+        "managed"
+      ]
+    },
     "buena_requeue_signal_enrichment": {
       "readOnly": false,
       "required": [
@@ -705,6 +787,20 @@
         "savedSearchId",
         "signalId",
         "titles"
+      ],
+      "workspaces": [
+        "legacy",
+        "managed"
+      ]
+    },
+    "buena_set_linkedin_timing": {
+      "readOnly": false,
+      "required": [
+        "campaignId",
+        "timing"
+      ],
+      "optional": [
+        "ownerEmail"
       ],
       "workspaces": [
         "legacy",
